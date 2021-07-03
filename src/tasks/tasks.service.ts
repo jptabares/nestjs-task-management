@@ -32,4 +32,10 @@ export class TasksService {
     this.tasks.splice(taskIndex, 1);
     return !this.tasks.some((task) => task.id === id);
   }
+
+  public updateTaskStatus(id: string, status: TaskStatus): Task {
+    const task: Task = this.getTaskById(id);
+    task.status = status;
+    return task;
+  }
 }
