@@ -1,4 +1,4 @@
-export class AddTaskDto {
+export class CreateTaskDto {
   title: string;
   description: string;
 }
