@@ -14,37 +14,27 @@ export class TasksService {
     private tasksRepository: TasksRepository,
   ) {}
 
-  public async getTaskById(id: string): Promise<Task> {
-    const found = await this.tasksRepository.findOne(id);
-    if (!found)
-      throw new NotFoundException(`Task with ID ${id} does not exist`);
-    return found;
+  public getTaskById(id: string): Promise<Task> {
+    return this.tasksRepository.getTaskById(id);
   }
+
+  public createTask(createTaskDto: CreateTaskDto): Promise<Task> {
+    return this.tasksRepository.createTask(createTaskDto);
+  }
+
+  public deleteTaskById(id: string): Promise<boolean> {
+    return this.tasksRepository.deleteTaskById(id);
+  }
+
+  public updateTaskStatusById(
+    id: string,
+    updateTaskStatusDto: UpdateTaskStatusDto,
+  ): Promise<Task> {
+    return this.tasksRepository.updateTaskStatusById(id, updateTaskStatusDto);
+  }
+
   /* public getTasks(): Task[] {
     return this.tasks;
-  }
-
-  public getTasksWithFilters(filterDto: GetTasksFilterDto): Task[] {
-    const { status, search } = filterDto;
-    let tasks: Task[] = this.getTasks();
-    if (status) {
-      tasks = tasks.filter((task) => task.status === status);
-    }
-    if (search) {
-      tasks = tasks.filter(
-        (tasks) =>
-          tasks.title.includes(search) || tasks.description.includes(search),
-      );
-    }
-    return tasks;
-  }
-
-  public getTaskById(id: string): Task {
-    const found = this.tasks.find((task) => task.id === id);
-    if (!found) {
-      throw new NotFoundException(`Task with ID ${id} not found`);
-    }
-    return found;
   }
 
   public createTask(createTaskDto: CreateTaskDto): Task {
@@ -57,15 +47,6 @@ export class TasksService {
     };
     this.tasks.push(task);
     return task;
-  }
-
-  public deleteTask(id: string): boolean {
-    const taskIndex: number = this.tasks.findIndex((task) => task.id === id);
-    if (taskIndex === -1) {
-      throw new NotFoundException(`Task with ID ${id} not found`);
-    }
-    this.tasks.splice(taskIndex, 1);
-    return !this.tasks.some((task) => task.id === id);
   }
 
   public updateTaskStatus(
