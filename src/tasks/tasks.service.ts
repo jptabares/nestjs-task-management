@@ -6,6 +6,7 @@ import { UpdateTaskStatusDto } from './dto/update-task-status.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TasksRepository } from './tasks.repository';
 import { Task } from './task.entity';
+import { DeleteResult } from 'typeorm';
 
 @Injectable()
 export class TasksService {
@@ -14,23 +15,37 @@ export class TasksService {
     private tasksRepository: TasksRepository,
   ) {}
 
-  public getTaskById(id: string): Promise<Task> {
-    return this.tasksRepository.getTaskById(id);
+  public getTasks(filterDto: GetTasksFilterDto): Promise<Task[]> {
+    return this.tasksRepository.getTasks(filterDto);
+  }
+
+  public async getTaskById(id: string): Promise<Task> {
+    const found = await this.tasksRepository.findOne(id);
+    if (!found)
+      throw new NotFoundException(`Task with ID ${id} does not exist`);
+    return found;
   }
 
   public createTask(createTaskDto: CreateTaskDto): Promise<Task> {
     return this.tasksRepository.createTask(createTaskDto);
   }
 
-  public deleteTaskById(id: string): Promise<boolean> {
-    return this.tasksRepository.deleteTaskById(id);
+  public async deleteTaskById(id: string): Promise<boolean> {
+    const res: DeleteResult = await this.tasksRepository.delete(id);
+    if (res.affected === 0)
+      throw new NotFoundException(`Task with ID ${id} does not exist`);
+    else return true;
   }
 
-  public updateTaskStatusById(
+  public async updateTaskStatusById(
     id: string,
     updateTaskStatusDto: UpdateTaskStatusDto,
   ): Promise<Task> {
-    return this.tasksRepository.updateTaskStatusById(id, updateTaskStatusDto);
+    const { status } = updateTaskStatusDto;
+    const task: Task = await this.getTaskById(id);
+    task.status = status;
+    await this.tasksRepository.save(task);
+    return task;
   }
 
   /* public getTasks(): Task[] {
