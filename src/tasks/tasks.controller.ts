@@ -11,14 +11,19 @@ import {
 import { CreateTaskDto } from './dto/create-task.dto';
 import { GetTasksFilterDto } from './dto/get-tasks-filter.dto';
 import { UpdateTaskStatusDto } from './dto/update-task-status.dto';
-import { Task, TaskStatus } from './task.model';
+import { TaskStatus } from './task-status.enum';
+import { Task } from './task.entity';
 import { TasksService } from './tasks.service';
 
 @Controller('tasks')
 export class TasksController {
   constructor(private tasksService: TasksService) {}
 
-  @Get()
+  @Get(':id')
+  public async getTask(@Param('id') id: string): Promise<Task> {
+    return await this.tasksService.getTaskById(id);
+  }
+  /* @Get()
   public getTasks(@Query() filterDto: GetTasksFilterDto): Task[] {
     if (Object.keys(filterDto).length) {
       return this.tasksService.getTasksWithFilters(filterDto);
@@ -48,5 +53,5 @@ export class TasksController {
     @Param('id') id: string,
   ): Task {
     return this.tasksService.updateTaskStatus(id, updateTaskStatusDto);
-  }
+  } */
 }
