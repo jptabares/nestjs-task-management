@@ -1,4 +1,5 @@
 import { NotFoundException } from '@nestjs/common';
+import { User } from 'src/auth/user.entity';
 import {
   DeleteResult,
   EntityRepository,
@@ -25,12 +26,16 @@ export class TasksRepository extends Repository<Task> {
     return await query.getMany();
   }
 
-  public async createTask(createTaskDto: CreateTaskDto): Promise<Task> {
+  public async createTask(
+    createTaskDto: CreateTaskDto,
+    user: User,
+  ): Promise<Task> {
     const { title, description } = createTaskDto;
     const task: Task = this.create({
       title,
       description,
       status: TaskStatus.OPEN,
+      user,
     });
     await this.save(task);
     return task;
