@@ -20,8 +20,8 @@ export class TasksService {
     return this.tasksRepository.getTasks(filterDto, user);
   }
 
-  public async getTaskById(id: string): Promise<Task> {
-    const found = await this.tasksRepository.findOne(id);
+  public async getTaskById(id: string, user: User): Promise<Task> {
+    const found = await this.tasksRepository.findOne({ id, user });
     if (!found)
       throw new NotFoundException(`Task with ID ${id} does not exist`);
     return found;
@@ -31,8 +31,8 @@ export class TasksService {
     return this.tasksRepository.createTask(createTaskDto, user);
   }
 
-  public async deleteTaskById(id: string): Promise<boolean> {
-    const res: DeleteResult = await this.tasksRepository.delete(id);
+  public async deleteTaskById(id: string, user: User): Promise<boolean> {
+    const res: DeleteResult = await this.tasksRepository.delete({ id, user });
     if (res.affected === 0)
       throw new NotFoundException(`Task with ID ${id} does not exist`);
     else return true;
@@ -41,9 +41,10 @@ export class TasksService {
   public async updateTaskStatusById(
     id: string,
     updateTaskStatusDto: UpdateTaskStatusDto,
+    user: User,
   ): Promise<Task> {
     const { status } = updateTaskStatusDto;
-    const task: Task = await this.getTaskById(id);
+    const task: Task = await this.getTaskById(id, user);
     task.status = status;
     await this.tasksRepository.save(task);
     return task;

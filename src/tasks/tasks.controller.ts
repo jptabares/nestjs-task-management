@@ -15,7 +15,6 @@ import { User } from 'src/auth/user.entity';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { GetTasksFilterDto } from './dto/get-tasks-filter.dto';
 import { UpdateTaskStatusDto } from './dto/update-task-status.dto';
-import { TaskStatus } from './task-status.enum';
 import { Task } from './task.entity';
 import { TasksService } from './tasks.service';
 
@@ -33,8 +32,11 @@ export class TasksController {
   }
 
   @Get(':id')
-  public getTask(@Param('id') id: string): Promise<Task> {
-    return this.tasksService.getTaskById(id);
+  public getTask(
+    @Param('id') id: string,
+    @GetUser() user: User,
+  ): Promise<Task> {
+    return this.tasksService.getTaskById(id, user);
   }
 
   @Post()
@@ -46,15 +48,23 @@ export class TasksController {
   }
 
   @Delete(':id')
-  public deleteTaskById(@Param('id') id: string): Promise<boolean> {
-    return this.tasksService.deleteTaskById(id);
+  public deleteTaskById(
+    @Param('id') id: string,
+    @GetUser() user: User,
+  ): Promise<boolean> {
+    return this.tasksService.deleteTaskById(id, user);
   }
 
   @Patch('/:id/status')
-  public asyncupdateTaskStatus(
+  public async updateTaskStatus(
     @Body() updateTaskStatusDto: UpdateTaskStatusDto,
     @Param('id') id: string,
+    @GetUser() user: User,
   ): Promise<Task> {
-    return this.tasksService.updateTaskStatusById(id, updateTaskStatusDto);
+    return this.tasksService.updateTaskStatusById(
+      id,
+      updateTaskStatusDto,
+      user,
+    );
   }
 }
